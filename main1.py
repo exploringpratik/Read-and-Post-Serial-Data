@@ -11,6 +11,7 @@ heartBeat = 0
 bodyTempr = 0
 geoLocation = []
 surrTempr = 0
+dataSample = "iCAT001t25s20h50p50g2740.746848,N,0851554059,E"
 
 jsonUpdateAnimal = {
     "heart_beat": heartBeat,
@@ -44,7 +45,7 @@ jsonPostGeoLocation = {
 def readSerialData():
     ser = serial.Serial('COM8', 9600)
     while 1:
-        print(ser.read(1))
+        alldata = ser.read(1)
 
 
 def updateAnimal(jsonFromFunction):
