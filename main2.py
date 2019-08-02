@@ -1,4 +1,4 @@
-import serial
+x = 5
+print(x)
 
-serialPort = serial.Serial(port="COM4", baudrate=115200,
-                           bytesize=8, timeout=2, stopbits=serial.STOPBITS_ONE)
+xy.append()

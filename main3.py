@@ -2,7 +2,7 @@ import re
 import math
 
 dataSample = "iCAT001t25s20h50p50g2740.746848,N,08515.54059,E"
-
+# dataSample = "iCAT00001s28h712t282"
 animalId = re.search('i(.*)t', dataSample)
 animalId = animalId.group(1)
 
@@ -28,6 +28,8 @@ longitudeFloat = float(longitude.group(1)) / 100
 afterDecimal, beforeDecimal = math.modf(longitudeFloat)
 longitude = beforeDecimal + afterDecimal * 100 / 60
 
+print("Data from Microcontroller: ", dataSample)
+print("---------------------------------------Output-------------------------------------------------")
 print("animal id = ", animalId)
 print("body temperature = ", bodyTemperature)
 print("surroundingTemperature = ", surroundingTemperature)
