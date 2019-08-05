@@ -3,6 +3,7 @@ import requests
 import time
 import re
 import math
+import datetime
 
 ser = serial.Serial('COM8', 9600)
 
@@ -13,8 +14,7 @@ ser = serial.Serial('COM8', 9600)
 # localMilli = x
 # animalId = '5d29ff5479ed0d22e0d25ac4'
 
-
-# x = 'iCA001s28h61t64g2740.74802N,08515.53755E'
+# x = 'iCAT001s26h68t55p164g2740.90578N,08515.35083E'
 
 def updateAnimal(jsonFromFunction):
     url = "https://animalmonitoringsystem.herokuapp.com/api/updateanimal/" + animalId
@@ -62,6 +62,8 @@ def checkAnimalId(animalIdFromController):
         animalId = '5d29fe2e79ed0d22e0d25ac3'
     elif animalIdFromController == 'DOG001':
         animalId = '5d29ff5479ed0d22e0d25ac4'
+    elif animalIdFromController == 'HUM001':
+        animalId = '5d47055e9025e300172796d4'
 
 
 def josnFileToUpload(animalId, bodyTempr, surrTempr, humidity, geoLocation, heartBeat):
@@ -107,13 +109,14 @@ def josnFileToUpload(animalId, bodyTempr, surrTempr, humidity, geoLocation, hear
     postsurrtempr(jsonPostSurrTempr)
 
 
+# iCAT001s26h68t55p164g2740.90578N,08515.35083E
 def receivedData(chunkdata):
     dataSample = chunkdata
     print(dataSample)
     animalId = re.search('i(.*)s', dataSample)
     animalId = animalId.group(1)
 
-    bodytemperature = re.search('t(.*)g', dataSample)
+    bodytemperature = re.search('t(.*)p', dataSample)
     bodytemperature = bodytemperature.group(1)
     bodytemperature = int(bodytemperature)
     bodytemperature = bodytemperature / 2.048
@@ -127,9 +130,10 @@ def receivedData(chunkdata):
     humidity = int(humidity)
     # humidity = float(humidity)
     # humidity = float(humidity)
-    # pulseRate = re.search('t(.*)s', dataSample)
-    # pulseRate = pulseRate.group(1)
-    pulseRate = 140
+    pulseRate = re.search('p(.*)g', dataSample)
+    pulseRate = pulseRate.group(1)
+    pulseRate = int(pulseRate)
+
     latitude = re.search('g(.*)N,', dataSample)
     latitudeFloat = float(latitude.group(1)) / 100
     afterDecimal, beforeDecimal = math.modf(latitudeFloat)
@@ -142,15 +146,25 @@ def receivedData(chunkdata):
     geoLocation = [latitude, longitude]
 
     print("---------------------------------------Output-------------------------------------------------")
-    print("Data from Microcontroller: ", dataSample, type(dataSample))
-    print("animal id = ", animalId, type(animalId))
-    print("body temperature = ", bodytemperature, type(bodytemperature))
-    print("surroundingTemperature = ", surroundingTemperature, type(surroundingTemperature))
-    print("humidity = ", humidity, type(humidity))
-    print("pulseRate= ", pulseRate, type(pulseRate))
-    print("latitude=  ", latitude, type(latitude))
-    print("longitude= ", longitude, type(longitude))
-    print("geolocation= ", geoLocation, type(geoLocation))
+    # print("Data from Microcontroller: ", dataSample, type(dataSample))
+    # print("animal id = ", animalId, type(animalId))
+    # print("body temperature = ", bodytemperature, type(bodytemperature))
+    # print("surroundingTemperature = ", surroundingTemperature, type(surroundingTemperature))
+    # print("humidity = ", humidity, type(humidity))
+    # print("pulseRate= ", pulseRate, type(pulseRate))
+    # print("latitude=  ", latitude, type(latitude))
+    # print("longitude= ", longitude, type(longitude))
+    # print("geolocation= ", geoLocation, type(geoLocation))
+    print("Data from Microcontroller: ", dataSample)
+    print("animal id = ", animalId)
+    print("body temperature = ", bodytemperature)
+    print("surroundingTemperature = ", surroundingTemperature)
+    print("humidity = ", humidity)
+    print("pulseRate= ", pulseRate)
+    print("latitude=  ", latitude)
+    print("longitude= ", longitude)
+    print("timestramp:", datetime.datetime.now())
+
     josnFileToUpload(animalId, bodytemperature, surroundingTemperature, humidity, geoLocation, pulseRate)
 
 
@@ -169,4 +183,5 @@ while 1:
     result = result.replace('\\r\\n', '')
 
     print(result)
-    # serialData(result)
+    if result[0] == 'i':
+        serialData(result)
